@@ -1,0 +1,32 @@
+{
+  "name": "pharos-clearing-house",
+  "version": "0.1.0",
+  "description": "x402 settlement, escrow, and paywalls for AI agents — gated by Sentinel, settled on Pharos.",
+  "type": "module",
+  "license": "MIT",
+  "main": "sdk/index.js",
+  "exports": {
+    ".": "./sdk/index.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test",
+    "demo": "node demos/demo.js",
+    "demo:unsafe": "node demos/unsafe.js",
+    "demo:paywall": "node demos/paywall.js",
+    "demo:video": "node demos/demo.js && echo '---' && node demos/paywall.js && echo '---' && node demos/unsafe.js",
+    "mcp": "node mcp/server.js"
+  },
+  "keywords": [
+    "pharos",
+    "x402",
+    "escrow",
+    "settlement",
+    "ai-agents",
+    "agent-skill",
+    "mcp",
+    "realfi"
+  ]
+}

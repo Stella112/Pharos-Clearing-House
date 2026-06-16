@@ -1,0 +1,20 @@
+[profile.default]
+src = "src"
+script = "script"
+out = "out"
+libs = ["lib"]
+solc = "0.8.24"
+optimizer = true
+optimizer_runs = 200
+remappings = [
+  "@openzeppelin/=lib/openzeppelin-contracts/",
+  "forge-std/=lib/forge-std/src/",
+]
+
+[rpc_endpoints]
+pharos_testnet = "${PHAROS_TESTNET_RPC}"
+
+# Verify with Blockscout on Pharos testnet, e.g.:
+#   forge verify-contract <addr> src/ClearingHouseEscrow.sol:ClearingHouseEscrow \
+#     --chain-id 688688 --verifier blockscout \
+#     --verifier-url https://api.socialscan.io/pharos-atlantic-testnet/v1/explorer/command_api/contract
