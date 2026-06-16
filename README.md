@@ -155,6 +155,13 @@ In the Agent Arena, Clearing House becomes the foundation of a **Treasurer
 Steward agent** that runs the full score → approve → settle pipeline
 autonomously, invoking Credit Bureau and Atlas Council as it goes.
 
+The Steward is a natural fit for **ERC-8004 (Trustless Agents)**: it can carry a
+portable on-chain identity and write Credit Bureau verdicts into an ERC-8004
+reputation registry, so a counterparty's creditworthiness — and the Steward's
+own settlement track record — become verifiable across the ecosystem. Identity
+and reputation (ERC-8004) sit one layer above settlement (this escrow); together
+they let agents transact with both safety and portable trust.
+
 ## License
 
 MIT

@@ -43,4 +43,14 @@ npm run mcp
 
 clearing_review_action, clearing_fund_escrow, clearing_release, clearing_refund, clearing_settle_x402, clearing_paywall_require, clearing_paywall_pay
 
+## Phase 2 roadmap
+
+Clearing House becomes a **Treasurer Steward agent** running score → approve →
+settle autonomously. The Steward is a natural fit for **ERC-8004 (Trustless
+Agents)** — carrying a portable on-chain identity and writing Credit Bureau
+verdicts into a reputation registry, so creditworthiness and settlement track
+record become verifiable across the ecosystem. Identity/reputation (ERC-8004)
+sits above settlement (this escrow); together they give agents safe *and*
+portable-trust transactions.
+
 **Contact / email:** [add]
