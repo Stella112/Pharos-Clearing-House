@@ -121,7 +121,7 @@ export class TreasurerSteward {
     const r = await refund({ adapter: this.adapter, escrowId: open.escrowId, now, signer: this.signer });
     this.committedUsd -= open.amountUsd; // budget freed back up
     this.openEscrows.delete(mandateId);
-    return this._log("refunded", { mandate: mandateId, escrowId: open.escrowId, amountUsd: r.amountUsd, remainingUsd: this.remainingBudgetUsd, settled: true });
+    return this._log("refunded", { mandate: mandateId, escrowId: open.escrowId, amountUsd: r.amountUsd, txHash: r.txHash, remainingUsd: this.remainingBudgetUsd, settled: true });
   }
 
   getAuditTrail() {

@@ -5,3 +5,4 @@ contracts/lib/
 contracts/broadcast/
 .env
 *.log
+.claude/

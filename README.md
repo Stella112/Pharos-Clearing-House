@@ -45,6 +45,7 @@ npm run demo        # full pipeline: credit verdict -> Sentinel -> escrow -> rel
 npm run demo:paywall# two-agent x402 paywall loop
 npm run demo:unsafe # Sentinel blocking unsafe settlements
 npm run agent       # Treasurer Steward agent runs the pipeline autonomously
+npm run dashboard   # live dashboard at http://localhost:8788 (drives the real agent)
 npm run mcp         # start the stdio MCP server
 ```
 
@@ -144,6 +145,7 @@ Credit Bureau critical flags or exposure-cap breaches.
 ├── SKILL.md is at skills/pharos-clearing-house/SKILL.md
 ├── sdk/            # dependency-free settlement SDK (sentinel, chain, clearing, x402)
 ├── agent/          # Treasurer Steward — autonomous agent that drives the skill
+├── dashboard/      # live web dashboard (runs the real agent in the browser)
 ├── mcp/server.js   # stdio MCP server exposing the tools
 ├── contracts/      # Foundry escrow contract + deploy script
 ├── demos/          # runnable demos (pipeline, paywall, safety)
@@ -173,6 +175,13 @@ It never reads or stores a private key — a `signer` is injected by the runtime
 (the simulation adapter offline; an RPC adapter + keystore on testnet). This is
 the bridge from a Phase 1 Skill to a Phase 2 Agent: the settlement skill is the
 hands, the Steward is the autonomy around them.
+
+A live dashboard (`npm run dashboard`, then open http://localhost:8788) renders
+the Steward working in real time — operating wallet, budget meter, the mandate
+queue with per-counterparty decisions, settlement outcomes, and the signed audit
+trail. It imports and runs the **actual agent code**, not a mock. Note it must be
+served over HTTP (the bundled zero-dependency server does this); opening the file
+directly won't work because the browser blocks ES-module imports over `file://`.
 
 ## Phase 2
 

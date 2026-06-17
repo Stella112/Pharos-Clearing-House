@@ -18,6 +18,7 @@
     "demo:paywall": "node demos/paywall.js",
     "demo:video": "node demos/demo.js && echo '---' && node demos/paywall.js && echo '---' && node demos/unsafe.js",
     "agent": "node agent/run.js",
+    "dashboard": "node dashboard/serve.js",
     "mcp": "node mcp/server.js"
   },
   "keywords": [
