@@ -95,18 +95,34 @@ const fund = await fundEscrow({
 await release({ adapter: chain, escrowId: fund.escrowId, proof: "deliverable:rwa-risk-report:sha:42abef" });
 ```
 
-### MCP usage
+### MCP usage — call the skill from an AI agent
 
-```
-npm run mcp
-```
+The skill ships an stdio MCP server, so any MCP-capable agent (Claude Desktop,
+Claude Code, Cursor, …) can invoke it directly. Add it to the client's MCP
+config (use an absolute path to `mcp/server.js`):
 
 ```json
 {
   "mcpServers": {
-    "pharos-clearing-house": { "command": "node", "args": ["mcp/server.js"] }
+    "pharos-clearing-house": {
+      "command": "node",
+      "args": ["C:/path/to/Pharos-Clearing-House/mcp/server.js"]
+    }
   }
 }
+```
+
+(A ready copy is in [`mcp/config.example.json`](mcp/config.example.json).) Restart
+the client, then prompt the agent in plain language:
+
+> "Use pharos-clearing-house to fund an escrow: payer 0xaaaa…, payee 0xbbbb…,
+> $1500 against the deliverable `rwa-risk-report`, then release it on that proof."
+
+The agent calls `clearing_fund_escrow` and `clearing_release` and reports the
+result — demonstrating a real, agent-callable skill. To run the server directly:
+
+```
+npm run mcp
 ```
 
 ## On-chain integration (Pharos testnet) — LIVE

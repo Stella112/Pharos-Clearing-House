@@ -73,6 +73,18 @@ npm run agent          # autonomous pipeline: fund / block / refuse / reclaim
 PRIVATE_KEY=0x... npm run live   # one real USDC escrow fund->release on Atlantic
 ```
 
+## Optional: show an AI agent calling the skill (MCP)
+
+A nice "agent-callable skill" shot. Add the MCP server to an MCP client
+(Claude Desktop, Claude Code, or Cursor) using `mcp/config.example.json` — point
+`args` at the absolute path to `mcp/server.js`. Restart the client, then prompt:
+
+> "Use pharos-clearing-house to fund an escrow: payer 0xaaaa…, payee 0xbbbb…,
+> $1500 against the deliverable rwa-risk-report, then release it on that proof."
+
+Record the agent calling `clearing_fund_escrow` / `clearing_release` and showing
+the result. Proves the skill is invoked by a real AI agent, not just scripts.
+
 ## After recording
 
 - Upload (YouTube unlisted / Loom / Drive) and paste the link into `SUBMISSION.md`.
