@@ -49,7 +49,8 @@ export async function fundEscrow({ adapter, plan, policy, signer }) {
     payer,
     payee,
     amountUnits: usdToUnits(amountUsd),
-    conditionHash: sha(condition),
+    condition,                    // raw — RPC adapter hashes with keccak256 on-chain
+    conditionHash: sha(condition), // simulation adapter's local digest
     deadline,
     signer,
   });

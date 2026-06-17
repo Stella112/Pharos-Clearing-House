@@ -19,7 +19,11 @@
     "demo:video": "node demos/demo.js && echo '---' && node demos/paywall.js && echo '---' && node demos/unsafe.js",
     "agent": "node agent/run.js",
     "dashboard": "node dashboard/serve.js",
+    "live": "node scripts/live-settle.mjs",
     "mcp": "node mcp/server.js"
+  },
+  "optionalDependencies": {
+    "ethers": "^6.16.0"
   },
   "keywords": [
     "pharos",

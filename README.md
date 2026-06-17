@@ -128,6 +128,24 @@ forge script script/Deploy.s.sol:Deploy --rpc-url $PHAROS_TESTNET_RPC --broadcas
 - USDC (Circle testnet faucet): `0xcfc8330f4bcab529c625d12781b1c19466a9fc8b`
 - **Deployed escrow address:** _add after deploy, with an explorer link_
 
+### Live settlement (real testnet, not simulation)
+
+The same agent and SDK run against the real chain by swapping the in-memory
+`SimulationAdapter` for the `PharosRpcAdapter` (`sdk/rpc-adapter.js`), which
+signs actual transactions to the deployed escrow and Circle USDC. The core stays
+zero-dependency; the live adapter needs `ethers` (an optional dependency).
+
+```
+export PRIVATE_KEY=...        # operating wallet, holds gas + testnet USDC
+export ESCROW_ADDRESS=0x...   # from the deploy above
+npm run live                  # real escrow fund -> release, prints explorer tx links
+```
+
+The operating wallet needs **PHRS** for gas and **testnet USDC** (from
+[faucet.circle.com](https://faucet.circle.com)) because the escrow moves USDC.
+The private key is read from the environment, lives only server-side, and is
+never placed in the browser or the repo.
+
 ## Safety model
 
 Clearing House never executes a write unless the Sentinel gate returns
@@ -143,9 +161,10 @@ Credit Bureau critical flags or exposure-cap breaches.
 ```
 .
 ├── SKILL.md is at skills/pharos-clearing-house/SKILL.md
-├── sdk/            # dependency-free settlement SDK (sentinel, chain, clearing, x402)
+├── sdk/            # settlement SDK — sim adapter (zero-dep) + PharosRpcAdapter (live)
 ├── agent/          # Treasurer Steward — autonomous agent that drives the skill
 ├── dashboard/      # live web dashboard (runs the real agent in the browser)
+├── scripts/        # live-settle.mjs — real escrow fund/release on testnet
 ├── mcp/server.js   # stdio MCP server exposing the tools
 ├── contracts/      # Foundry escrow contract + deploy script
 ├── demos/          # runnable demos (pipeline, paywall, safety)
