@@ -208,12 +208,23 @@ It never reads or stores a private key — a `signer` is injected by the runtime
 the bridge from a Phase 1 Skill to a Phase 2 Agent: the settlement skill is the
 hands, the Steward is the autonomy around them.
 
-A live dashboard (`npm run dashboard`, then open http://localhost:8788) renders
-the Steward working in real time — operating wallet, budget meter, the mandate
-queue with per-counterparty decisions, settlement outcomes, and the signed audit
-trail. It imports and runs the **actual agent code**, not a mock. Note it must be
-served over HTTP (the bundled zero-dependency server does this); opening the file
-directly won't work because the browser blocks ES-module imports over `file://`.
+A dashboard (`npm run dashboard`, then open http://localhost:8788) renders the
+Steward working — operating wallet, budget meter, the mandate queue with
+per-counterparty decisions, settlement outcomes, and the signed audit trail. It
+imports and runs the **actual agent code**, not a mock. It has two modes:
+
+- **Simulation** — the in-memory pipeline, always works, ideal for the walkthrough.
+- **Live · testnet** — reads the operating wallet's **real** USDC/gas balances and
+  runs **real** escrow settlements through the deployed contract, rendering each
+  transaction's Atlantic explorer link as on-chain proof. Start it with the key
+  held server-side (never sent to the browser):
+
+  ```
+  PRIVATE_KEY=0x... npm run dashboard:live    # http://localhost:8789
+  ```
+
+Served over HTTP (the bundled server does this); opening the file directly won't
+work because the browser blocks ES-module imports over `file://`.
 
 ## Phase 2
 

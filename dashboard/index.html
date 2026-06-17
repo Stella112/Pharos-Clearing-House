@@ -55,6 +55,14 @@
   .fence b { color: var(--ink); }
   footer { color: var(--mut); font-size: 12px; margin-top: 22px; text-align: center; }
   .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+  .seg { display:inline-flex; border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+  .seg button { background:transparent; color:var(--mut); border:0; padding:8px 14px; border-radius:0; font-weight:600; }
+  .seg button.on { background:var(--acc); color:#07101f; }
+  .link { color: var(--acc); text-decoration: none; }
+  .link:hover { text-decoration: underline; }
+  .live-note { font-size:12px; color:var(--mut); margin-top:8px; }
+  .pulse { animation: pulse 1.2s ease; }
+  @keyframes pulse { from { background:#3ddc8433; } to { background:transparent; } }
 </style>
 </head>
 <body>
@@ -64,9 +72,19 @@
       <h1>Pharos Clearing House <span class="sub">· Treasurer Steward</span></h1>
       <div class="tag">Autonomous x402 settlement — scores, gates, and settles with no human in the loop. Driven live by the actual agent code.</div>
     </div>
-    <div class="pill">chain 688688 · testnet</div>
+    <div class="pill" id="netpill">simulation · in-memory</div>
   </header>
 
+  <div class="ctl" style="margin-top:18px">
+    <span class="tag">Mode</span>
+    <div class="seg">
+      <button id="mode-sim" class="on">Simulation</button>
+      <button id="mode-live">Live · testnet</button>
+    </div>
+    <span class="tag" id="mode-note"></span>
+  </div>
+
+  <div id="sim-panel">
   <div class="grid">
     <div class="card"><div class="k">Operating wallet</div><div class="v small mono" id="wallet">—</div></div>
     <div class="card"><div class="k">Budget</div><div class="v" id="budget">—</div></div>
@@ -105,6 +123,26 @@
     <h2>Signed audit trail</h2>
     <div class="audit" id="audit"></div>
   </section>
+  </div><!-- /sim-panel -->
+
+  <div id="live-panel" hidden>
+    <div class="grid">
+      <div class="card"><div class="k">Operating wallet</div><div class="v small mono" id="l-wallet">—</div></div>
+      <div class="card"><div class="k">USDC balance (real)</div><div class="v" id="l-usdc">—</div></div>
+      <div class="card"><div class="k">Gas · PHRS</div><div class="v" id="l-gas">—</div></div>
+      <div class="card"><div class="k">Escrow contract</div><div class="v small mono" id="l-escrow">—</div></div>
+    </div>
+    <div class="ctl">
+      <button id="l-run">▶ Run live settlement ($1 USDC)</button>
+      <span class="tag" id="l-status">Reading chain…</span>
+    </div>
+    <section>
+      <h2>On-chain settlement proof</h2>
+      <table><thead><tr><th>Time</th><th>Amount</th><th>Escrow</th><th>Fund tx</th><th>Release tx</th></tr></thead>
+      <tbody id="l-proof"></tbody></table>
+      <div class="live-note">Real transactions on Pharos Atlantic Testnet (chain 688689). Click any hash to verify on the explorer.</div>
+    </section>
+  </div>
 
   <footer>Pharos Clearing House — Credit Bureau scores · Atlas Council approves · Clearing House settles. The Steward is the autonomy around the hands.</footer>
 </div>
@@ -195,6 +233,68 @@
   $("run").addEventListener("click", run);
   $("reset").addEventListener("click", reset);
   reset();
+
+  // ---- Live (testnet) mode: real balances + real on-chain settlements ----
+  const fmt = (n, d = 4) => Number(n).toLocaleString(undefined, { maximumFractionDigits: d });
+
+  function proofRow(x) {
+    const t = x.at.slice(11, 19);
+    return `<tr><td class="mono">${t}</td><td class="amt">$${x.amountUsd}</td><td class="mono">#${x.escrowId}</td>` +
+      `<td><a class="link mono" href="${x.fund.url}" target="_blank" rel="noopener">${x.fund.hash.slice(0, 10)}…</a></td>` +
+      `<td><a class="link mono" href="${x.release.url}" target="_blank" rel="noopener">${x.release.hash.slice(0, 10)}…</a></td></tr>`;
+  }
+  function renderLive(s) {
+    $("l-wallet").textContent = s.payer;
+    $("l-usdc").textContent = "$" + fmt(s.usdc, 2);
+    $("l-gas").textContent = fmt(s.gas, 5);
+    $("l-escrow").innerHTML = `<a class="link" href="${s.escrowUrl}" target="_blank" rel="noopener">${s.escrow.slice(0, 10)}…${s.escrow.slice(-6)}</a>`;
+    $("l-proof").innerHTML = s.settlements.map(proofRow).join("");
+  }
+  async function refreshLive() {
+    try {
+      const r = await fetch("/api/state");
+      if (!r.ok) throw new Error("unavailable");
+      const s = await r.json();
+      renderLive(s);
+      $("netpill").textContent = `chain ${s.chainId} · atlantic · LIVE`;
+      $("l-status").textContent = `Live on ${s.network} (chain ${s.chainId}) — real balances.`;
+    } catch {
+      $("l-status").textContent = "Live API not running. Start it: PRIVATE_KEY=… npm run dashboard:live";
+    }
+  }
+  async function runLive() {
+    $("l-run").disabled = true;
+    $("l-status").textContent = "Submitting fund + release on-chain… (waiting for confirmations)";
+    try {
+      const r = await fetch("/api/settle", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ amountUsd: 1 }) });
+      const j = await r.json();
+      if (!j.ok) {
+        $("l-status").textContent = "Blocked: " + (j.reasons ? j.reasons.join("; ") : j.error);
+      } else {
+        await refreshLive();
+        const first = $("l-proof").firstElementChild;
+        if (first) first.classList.add("pulse");
+        $("l-status").textContent = `Settled $1 on-chain — escrow #${j.escrowId}. Two real txs added below.`;
+      }
+    } catch (e) {
+      $("l-status").textContent = "Error: " + e.message;
+    }
+    $("l-run").disabled = false;
+  }
+  function setMode(sim) {
+    $("sim-panel").hidden = !sim;
+    $("live-panel").hidden = sim;
+    $("mode-sim").classList.toggle("on", sim);
+    $("mode-live").classList.toggle("on", !sim);
+    if (sim) $("netpill").textContent = "simulation · in-memory";
+    else refreshLive();
+  }
+  $("mode-sim").addEventListener("click", () => setMode(true));
+  $("mode-live").addEventListener("click", () => setMode(false));
+  $("l-run").addEventListener("click", runLive);
+
+  // Hint whether the live backend is present (static server has no /api/state).
+  fetch("/api/state").then((r) => { $("mode-note").textContent = r.ok ? "● live on-chain available" : ""; }).catch(() => {});
 </script>
 </body>
 </html>
