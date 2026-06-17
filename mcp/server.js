@@ -23,12 +23,32 @@ import {
   SimulationAdapter,
 } from "../sdk/index.js";
 
-const chain = new SimulationAdapter({
-  balances: {
-    "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": 100000,
-    "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": 0,
-  },
-});
+// Live mode: if PRIVATE_KEY + ESCROW_ADDRESS are set, an agent calling these
+// tools settles real USDC on Pharos through the deployed contract. Otherwise it
+// runs the in-memory simulation. ethers is imported only when live (optional dep).
+async function makeChain() {
+  if (process.env.PRIVATE_KEY && process.env.ESCROW_ADDRESS) {
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED ??= "0";
+    const { PharosRpcAdapter } = await import("../sdk/rpc-adapter.js");
+    const a = new PharosRpcAdapter({
+      rpcUrl: process.env.PHAROS_TESTNET_RPC,
+      privateKey: process.env.PRIVATE_KEY,
+      escrowAddress: process.env.ESCROW_ADDRESS,
+    });
+    await a.syncNetwork();
+    console.error(`[pharos-clearing-house] LIVE on ${a.network.name} (chain ${a.network.chainId})`);
+    return a;
+  }
+  console.error("[pharos-clearing-house] simulation mode");
+  return new SimulationAdapter({
+    balances: {
+      "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": 100000,
+      "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": 0,
+    },
+  });
+}
+
+const chain = await makeChain();
 
 const TOOLS = [
   {

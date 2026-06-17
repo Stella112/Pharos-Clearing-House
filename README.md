@@ -138,7 +138,30 @@ Then prompt the agent in plain language:
 > $1500 against the deliverable `rwa-risk-report`, then release it on that proof."
 
 The agent calls `clearing_fund_escrow` and `clearing_release` and reports the
-result — demonstrating a real, agent-callable skill. To run the server directly:
+result — demonstrating a real, agent-callable skill.
+
+By default the server settles in-memory. Set `PRIVATE_KEY` and `ESCROW_ADDRESS`
+(and optionally `PHAROS_TESTNET_RPC`) in the MCP server's `env` and the same
+tool calls settle **real USDC on Pharos** through the deployed contract — so an
+agent invoking the skill produces an actual on-chain transaction:
+
+```json
+{
+  "mcpServers": {
+    "pharos-clearing-house": {
+      "command": "node",
+      "args": ["C:/path/to/Pharos-Clearing-House/mcp/server.js"],
+      "env": {
+        "PRIVATE_KEY": "0x...",
+        "ESCROW_ADDRESS": "0xdE52Ac56708C05FE1f8F69D8074A543FAcB1Faab",
+        "PHAROS_TESTNET_RPC": "https://atlantic.dplabs-internal.com"
+      }
+    }
+  }
+}
+```
+
+To run the server directly:
 
 ```
 npm run mcp
