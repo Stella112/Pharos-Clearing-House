@@ -112,8 +112,27 @@ config (use an absolute path to `mcp/server.js`):
 }
 ```
 
-(A ready copy is in [`mcp/config.example.json`](mcp/config.example.json).) Restart
-the client, then prompt the agent in plain language:
+(A ready copy is in [`mcp/config.example.json`](mcp/config.example.json).) Use an
+absolute path to `mcp/server.js`. Per client:
+
+**Claude Code** — one command from the repo root:
+
+```
+claude mcp add pharos-clearing-house -- node ./mcp/server.js
+```
+
+or commit a project-scoped `.mcp.json` with the `mcpServers` block above
+(relative `./mcp/server.js` works). Check it loaded with `/mcp`.
+
+**Cursor** — add the `mcpServers` block to `.cursor/mcp.json` (project) or
+`~/.cursor/mcp.json` (global, Windows: `C:\Users\<you>\.cursor\mcp.json`), then
+enable it under Settings → MCP.
+
+**Claude Desktop** — Settings → Developer → Edit Config opens
+`claude_desktop_config.json` (Windows: `%APPDATA%\Claude\`). Paste the
+`mcpServers` block and restart the app.
+
+Then prompt the agent in plain language:
 
 > "Use pharos-clearing-house to fund an escrow: payer 0xaaaa…, payee 0xbbbb…,
 > $1500 against the deliverable `rwa-risk-report`, then release it on that proof."
