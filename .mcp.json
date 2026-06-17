@@ -1,8 +1,0 @@
-{
-  "mcpServers": {
-    "pharos-clearing-house": {
-      "command": "node",
-      "args": ["./mcp/server.js"]
-    }
-  }
-}

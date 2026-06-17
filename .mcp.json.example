@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "pharos-clearing-house": {
+      "command": "node",
+      "args": ["./mcp/server.js"],
+      "env": {
+        "PRIVATE_KEY": "0x...optional, enables real on-chain settlement...",
+        "ESCROW_ADDRESS": "0xdE52Ac56708C05FE1f8F69D8074A543FAcB1Faab",
+        "PHAROS_TESTNET_RPC": "https://atlantic.dplabs-internal.com",
+        "NODE_TLS_REJECT_UNAUTHORIZED": "0"
+      }
+    }
+  }
+}
