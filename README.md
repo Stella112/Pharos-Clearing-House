@@ -40,10 +40,11 @@ deliverable hash and release only when the report is delivered.
 No install required — the SDK and demos are dependency-free and run on Node 18+.
 
 ```
-npm test            # 13 tests, Node's built-in runner
+npm test            # 18 tests, Node's built-in runner
 npm run demo        # full pipeline: credit verdict -> Sentinel -> escrow -> release
 npm run demo:paywall# two-agent x402 paywall loop
 npm run demo:unsafe # Sentinel blocking unsafe settlements
+npm run agent       # Treasurer Steward agent runs the pipeline autonomously
 npm run mcp         # start the stdio MCP server
 ```
 
@@ -142,6 +143,7 @@ Credit Bureau critical flags or exposure-cap breaches.
 .
 ├── SKILL.md is at skills/pharos-clearing-house/SKILL.md
 ├── sdk/            # dependency-free settlement SDK (sentinel, chain, clearing, x402)
+├── agent/          # Treasurer Steward — autonomous agent that drives the skill
 ├── mcp/server.js   # stdio MCP server exposing the tools
 ├── contracts/      # Foundry escrow contract + deploy script
 ├── demos/          # runnable demos (pipeline, paywall, safety)
@@ -149,11 +151,34 @@ Credit Bureau critical flags or exposure-cap breaches.
 └── README.md
 ```
 
+## Autonomous agent (Phase 2 preview)
+
+The skill ships with a runnable **Treasurer Steward** agent (`agent/steward.js`)
+that *drives* the Clearing House with no human in the loop beyond its standing
+mandate. Given a queue of hire requests it autonomously scores each
+counterparty, funds what's safe, refuses what's over budget, blocks what fails
+Sentinel, then releases on delivery or reclaims on timeout:
+
+```
+npm run agent
+```
+
+The agent acts, but stays inside three fences:
+
+- a **dedicated operating wallet**, not the user's main wallet;
+- a **hard budget cap** it cannot spend past, tracked across mandates;
+- the **same Sentinel gate** the skill enforces on every write.
+
+It never reads or stores a private key — a `signer` is injected by the runtime
+(the simulation adapter offline; an RPC adapter + keystore on testnet). This is
+the bridge from a Phase 1 Skill to a Phase 2 Agent: the settlement skill is the
+hands, the Steward is the autonomy around them.
+
 ## Phase 2
 
-In the Agent Arena, Clearing House becomes the foundation of a **Treasurer
-Steward agent** that runs the full score → approve → settle pipeline
-autonomously, invoking Credit Bureau and Atlas Council as it goes.
+In the Agent Arena, the Treasurer Steward graduates from preview to a deployed
+agent that runs the full score → approve → settle pipeline live, invoking Credit
+Bureau and Atlas Council as it goes.
 
 The Steward is a natural fit for **ERC-8004 (Trustless Agents)**: it can carry a
 portable on-chain identity and write Credit Bureau verdicts into an ERC-8004
