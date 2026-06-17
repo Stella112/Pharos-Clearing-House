@@ -13,7 +13,7 @@
 // (env/keystore) and lives only here — never in the browser, never in the repo.
 
 import { ethers } from "ethers";
-import { PHAROS, USDC_DECIMALS } from "./chain.js";
+import { PHAROS, networkByChainId, USDC_DECIMALS } from "./chain.js";
 
 const ESCROW_ABI = [
   "function fund(address payee,address token,uint256 amount,bytes32 conditionHash,uint64 deadline) returns (uint256 id)",
@@ -36,14 +36,25 @@ const toSeconds = (deadline) => (deadline > 1e12 ? Math.floor(deadline / 1000) :
 const conditionToHash = (condition) => ethers.keccak256(ethers.toUtf8Bytes(condition));
 
 export class PharosRpcAdapter {
-  constructor({ rpcUrl, privateKey, escrowAddress, usdcAddress, network = PHAROS.testnet }) {
+  constructor({ rpcUrl, privateKey, escrowAddress, usdcAddress, network }) {
     if (!escrowAddress) throw new Error("escrowAddress required");
-    this._network = network;
-    this.usdcAddress = usdcAddress || network.usdc;
-    this.provider = new ethers.JsonRpcProvider(rpcUrl || network.rpcUrl, undefined, { staticNetwork: true });
+    this._network = network || PHAROS.testnet;
+    this.usdcAddress = usdcAddress || this._network.usdc;
+    this.provider = new ethers.JsonRpcProvider(rpcUrl || this._network.rpcUrl, undefined, { staticNetwork: true });
     this.signer = privateKey ? new ethers.Wallet(privateKey, this.provider) : null;
     this.escrow = new ethers.Contract(escrowAddress, ESCROW_ABI, this.signer || this.provider);
     this.usdc = new ethers.Contract(this.usdcAddress, ERC20_ABI, this.signer || this.provider);
+  }
+
+  // Confirm the live chain id and align the network config (name, explorer) to
+  // it, so receipts and explorer links are always correct. Call once after
+  // construction; safe to await before settling.
+  async syncNetwork() {
+    const { chainId } = await this.provider.getNetwork();
+    this._network = networkByChainId(chainId);
+    if (!this.usdcAddress || this.usdcAddress === PHAROS.testnet.usdc) this.usdcAddress = this._network.usdc;
+    this.usdc = new ethers.Contract(this.usdcAddress, ERC20_ABI, this.signer || this.provider);
+    return this._network;
   }
 
   get network() {

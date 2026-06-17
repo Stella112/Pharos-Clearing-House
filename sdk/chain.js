@@ -15,11 +15,20 @@ export const PHAROS = {
     // Circle testnet USDC on Pharos
     usdc: "0xcfc8330f4bcab529c625d12781b1c19466a9fc8b",
   },
-  mainnet: {
-    name: "pharos-mainnet",
+  atlantic: {
+    name: "pharos-atlantic-testnet",
     chainId: 688689,
+    rpcUrl: "https://atlantic.dplabs-internal.com",
+    explorer: "https://atlantic.pharosscan.xyz",
+    usdc: "0xcfc8330f4bcab529c625d12781b1c19466a9fc8b",
   },
 };
+
+// Resolve a known Pharos network by its chain id (falls back to testnet).
+export function networkByChainId(chainId) {
+  const id = Number(chainId);
+  return Object.values(PHAROS).find((n) => n.chainId === id) || PHAROS.testnet;
+}
 
 export const USDC_DECIMALS = 6;
 const ZERO = "0x0000000000000000000000000000000000000000";

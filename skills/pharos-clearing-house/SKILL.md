@@ -64,9 +64,13 @@ deliverable hash and release only when the report is delivered.
 
 ## Network
 
-Pharos testnet (chain `688688`), USDC via Circle's testnet faucet
-(`0xcfc8330f4bcab529c625d12781b1c19466a9fc8b`). Escrow contract:
-`contracts/src/ClearingHouseEscrow.sol`. Deployed address: _add after deploy_.
+Deployed live on Pharos Atlantic Testnet (chain `688689`); Pharos Testnet
+(`688688`) also supported. USDC via Circle's testnet faucet
+(`0xcfc8330f4bcab529c625d12781b1c19466a9fc8b`). Escrow contract
+(`contracts/src/ClearingHouseEscrow.sol`) deployed at
+`0xdE52Ac56708C05FE1f8F69D8074A543FAcB1Faab`
+([explorer](https://atlantic.pharosscan.xyz/address/0xdE52Ac56708C05FE1f8F69D8074A543FAcB1Faab)),
+with a real USDC fund→release settled through it on-chain.
 
 ## Layers
 

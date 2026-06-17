@@ -11,7 +11,9 @@
 
 **Demo video:** [add link]
 
-**Deployed escrow (Pharos testnet):** [add contract address + explorer link]
+**Deployed escrow (Pharos Atlantic Testnet, chain 688689):** [`0xdE52Ac56708C05FE1f8F69D8074A543FAcB1Faab`](https://atlantic.pharosscan.xyz/address/0xdE52Ac56708C05FE1f8F69D8074A543FAcB1Faab)
+
+**Live settlement proof (real USDC):** fund [`0xcaf1…02a9`](https://atlantic.pharosscan.xyz/tx/0xcaf19162a9845c6423536fb8740b231f1ac6cdfe66950ff2a24d04b92f0a02a9) · release [`0x62ea…efef8`](https://atlantic.pharosscan.xyz/tx/0x62ea0119b6f790922e90906de8917ca65827b6776d45ab3818213d4ca05efef8)
 
 ## What it is
 

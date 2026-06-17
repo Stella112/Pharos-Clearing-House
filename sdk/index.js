@@ -13,6 +13,7 @@ export {
   ChainAdapter,
   SimulationAdapter,
   PHAROS,
+  networkByChainId,
   USDC_DECIMALS,
   usdToUnits,
   unitsToUsd,

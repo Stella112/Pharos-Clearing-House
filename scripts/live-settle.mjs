@@ -29,6 +29,7 @@ if (!PRIVATE_KEY || !ESCROW_ADDRESS) {
 }
 
 const chain = new PharosRpcAdapter({ rpcUrl: RPC, privateKey: PRIVATE_KEY, escrowAddress: ESCROW_ADDRESS });
+await chain.syncNetwork(); // align name/explorer to the live chain id
 const payer = await chain.signer.getAddress();
 const condition = `deliverable:live-demo:${Date.now()}`;
 

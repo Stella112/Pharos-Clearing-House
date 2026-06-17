@@ -109,9 +109,22 @@ npm run mcp
 }
 ```
 
-## On-chain integration (Pharos testnet)
+## On-chain integration (Pharos testnet) — LIVE
 
-The escrow logic is deployable as a clean, audit-friendly Solidity contract
+The escrow is **deployed and verified live on Pharos Atlantic Testnet (chain
+`688689`)**, with a real USDC settlement run end-to-end through it:
+
+| | |
+| --- | --- |
+| **Escrow contract** | [`0xdE52Ac56708C05FE1f8F69D8074A543FAcB1Faab`](https://atlantic.pharosscan.xyz/address/0xdE52Ac56708C05FE1f8F69D8074A543FAcB1Faab) |
+| **Fund tx** (approve + lock 2 USDC) | [`0xcaf1…02a9`](https://atlantic.pharosscan.xyz/tx/0xcaf19162a9845c6423536fb8740b231f1ac6cdfe66950ff2a24d04b92f0a02a9) |
+| **Release tx** (proof → payee) | [`0x62ea…efef8`](https://atlantic.pharosscan.xyz/tx/0x62ea0119b6f790922e90906de8917ca65827b6776d45ab3818213d4ca05efef8) |
+| **Network** | Pharos Atlantic Testnet · chain `688689` · RPC `https://atlantic.dplabs-internal.com` |
+
+Real USDC moved through the Sentinel-gated escrow: the payer balance went 20 →
+18 USDC and the payee received 2, settled only after a matching proof.
+
+The contract is a clean, audit-friendly Solidity escrow
 (`contracts/src/ClearingHouseEscrow.sol`): no admin, no upgrade path, no
 delegatecall, reentrancy-guarded, funds move along exactly two paths
 (release-on-proof, refund-after-deadline).
@@ -124,9 +137,9 @@ export PHAROS_TESTNET_RPC=...     # Pharos testnet RPC
 forge script script/Deploy.s.sol:Deploy --rpc-url $PHAROS_TESTNET_RPC --broadcast
 ```
 
-- Chain ID: `688688`
+- Live chain: Pharos Atlantic Testnet `688689` (Pharos Testnet `688688` also supported)
 - USDC (Circle testnet faucet): `0xcfc8330f4bcab529c625d12781b1c19466a9fc8b`
-- **Deployed escrow address:** _add after deploy, with an explorer link_
+- Deployed escrow: `0xdE52Ac56708C05FE1f8F69D8074A543FAcB1Faab` ([explorer](https://atlantic.pharosscan.xyz/address/0xdE52Ac56708C05FE1f8F69D8074A543FAcB1Faab))
 
 ### Live settlement (real testnet, not simulation)
 

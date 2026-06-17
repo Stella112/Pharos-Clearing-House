@@ -8,7 +8,7 @@
 import { isAddress } from "./chain.js";
 
 export const DEFAULT_POLICY = {
-  allowedNetworks: ["pharos-testnet", "pharos-mainnet", 688688, 688689],
+  allowedNetworks: ["pharos-testnet", "pharos-atlantic-testnet", "pharos-mainnet", 688688, 688689],
   maxTransferUsd: 10000,
   requireUserConfirmedForWrites: true,
   requireKnownContractForWrites: true,
