@@ -142,6 +142,11 @@
       <tbody id="l-proof"></tbody></table>
       <div class="live-note">Real transactions on Pharos Atlantic Testnet (chain 688689). Click any hash to verify on the explorer.</div>
     </section>
+    <section>
+      <h2>Signed audit trail (agent)</h2>
+      <div class="audit" id="l-audit"></div>
+      <div class="live-note">Produced by the Treasurer Steward driving each live settlement: Credit Bureau verdict → Sentinel gate → on-chain fund → release.</div>
+    </section>
   </div>
 
   <footer>Pharos Clearing House — Credit Bureau scores · Atlas Council approves · Clearing House settles. The Steward is the autonomy around the hands.</footer>
@@ -249,6 +254,16 @@
     $("l-gas").textContent = fmt(s.gas, 5);
     $("l-escrow").innerHTML = `<a class="link" href="${s.escrowUrl}" target="_blank" rel="noopener">${s.escrow.slice(0, 10)}…${s.escrow.slice(-6)}</a>`;
     $("l-proof").innerHTML = s.settlements.map(proofRow).join("");
+    renderLiveAudit(s.audit || []);
+  }
+  function renderLiveAudit(audit) {
+    $("l-audit").innerHTML = audit.map((e) => {
+      const t = e.at.slice(11, 19);
+      const detail = e.reason || (e.reasons ? e.reasons.join("; ") : "")
+        || [e.task, e.band ? `band=${e.band}` : "", e.amountUsd ? "$" + e.amountUsd : "", e.escrowId ? "#" + e.escrowId : "", e.txHash ? e.txHash.slice(0, 12) + "…" : ""].filter(Boolean).join(" · ");
+      return `<div class="e"><span class="t">${t}</span><span class="s">${e.step}</span><span>${detail}</span></div>`;
+    }).join("");
+    $("l-audit").scrollTop = $("l-audit").scrollHeight;
   }
   async function refreshLive() {
     try {
