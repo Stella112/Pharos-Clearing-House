@@ -33,13 +33,28 @@ const settlements = [];
 const liveCreditOracle = async () => ({ band: "prime", score: 78, confidence: 0.82, exposureCapUsd: 100000, criticalFlags: [] });
 
 async function init() {
-  if (!PRIVATE_KEY) { initError = "Set PRIVATE_KEY to enable live mode."; return; }
-  adapter = new PharosRpcAdapter({ rpcUrl: RPC, privateKey: PRIVATE_KEY, escrowAddress: ESCROW_ADDRESS });
-  network = await adapter.syncNetwork();
-  payer = await adapter.signer.getAddress();
-  steward = new TreasurerSteward({ adapter, operatingWallet: payer, budgetUsd: 100000, signer: adapter.signer, creditOracle: liveCreditOracle });
-  ready = true;
-  console.log(`Live mode: ${network.name} (chain ${network.chainId}) as ${payer}`);
+  if (!PRIVATE_KEY) { initError = "Set PRIVATE_KEY to enable live mode."; return false; }
+  try {
+    adapter = new PharosRpcAdapter({ rpcUrl: RPC, privateKey: PRIVATE_KEY, escrowAddress: ESCROW_ADDRESS });
+    network = await adapter.syncNetwork();
+    payer = await adapter.signer.getAddress();
+    steward = new TreasurerSteward({ adapter, operatingWallet: payer, budgetUsd: 100000, signer: adapter.signer, creditOracle: liveCreditOracle });
+    ready = true;
+    initError = null;
+    console.log(`Live mode: ${network.name} (chain ${network.chainId}) as ${payer}`);
+    return true;
+  } catch (e) {
+    initError = "RPC not ready yet: " + (e.shortMessage || e.message);
+    return false;
+  }
+}
+
+// The Atlantic RPC can be momentarily slow — retry instead of crashing the server.
+async function initWithRetry() {
+  for (let i = 0; i < 15 && !ready; i++) {
+    if (await init()) return;
+    await new Promise((r) => setTimeout(r, 2000));
+  }
 }
 
 const tx = (hash) => ({ hash, url: `${network.explorer}/tx/${hash}` });
@@ -108,5 +123,7 @@ const server = createServer(async (req, res) => {
   } catch { res.writeHead(404); res.end("not found"); }
 });
 
-await init();
-server.listen(PORT, () => console.log(`Dashboard (live): http://localhost:${PORT}/  ${ready ? "[LIVE]" : "[" + initError + "]"}`));
+// Listen first so a slow RPC never stops the dashboard from serving; connect in
+// the background and keep retrying until the chain responds.
+server.listen(PORT, () => console.log(`Dashboard (live): http://localhost:${PORT}/  (connecting to Pharos…)`));
+initWithRetry();
