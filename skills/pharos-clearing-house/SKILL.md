@@ -39,6 +39,28 @@ the **Clearing House** settles.
 | "run the safety gate before settling" | SDK `clearing_review_action` / MCP | → [references/sentinel-policy.md](../../references/sentinel-policy.md) |
 | "settle an agent-to-agent x402 payment", "pay a paywall", "gate a resource" | SDK / MCP tools | → [references/x402-flow.md](../../references/x402-flow.md) |
 
+## Network configuration
+
+RPC URLs, chain IDs, explorer URLs, and contract addresses resolve from
+[`assets/networks.json`](../../assets/networks.json). Default:
+`pharos-atlantic-testnet` (688689), escrow `0xdE52Ac56708C05FE1f8F69D8074A543FAcB1Faab`.
+
+## Write operation pre-checks
+
+Before any settling `cast send` (approve / fund / release / refund), run all four
+checks, then require a Sentinel `approve`:
+
+1. **Key** — `cast wallet address --private-key $PRIVATE_KEY` derives the expected operator.
+2. **Address** — recipient/contract is `0x` + 40 hex (42 chars total).
+3. **Network** — `cast chain-id --rpc-url $RPC` returns `688689`.
+4. **Balance** — `cast balance $DEPLOYER --rpc-url $RPC --ether` covers amount + gas.
+
+## Security reminders
+
+- Foundry does **not** auto-read env vars — pass `--private-key $PRIVATE_KEY` explicitly on every command.
+- Never hardcode or commit a private key. This skill never reads, stores, or prints keys.
+- Treat Pharos mainnet as a separate, explicit confirmation step.
+
 ## When to use
 
 - An agent has an approved plan and needs to **lock funds** until a deliverable arrives → `fund_escrow`, then `release` / `refund`.
