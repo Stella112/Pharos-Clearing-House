@@ -22,6 +22,23 @@ It is the settlement counterpart to a full agent-finance stack: the **Credit
 Bureau** assesses counterparties, the **Atlas Council** decides and gates, and
 the **Clearing House** settles.
 
+## Prerequisites
+
+- **Foundry** (`forge`, `cast`) for direct on-chain calls, or **Node 18+** for the SDK / MCP server.
+- A funded operating wallet (PHRS for gas, testnet USDC). The private key stays in the caller's shell (`$PRIVATE_KEY`); this skill never reads or stores it.
+- Network + contract addresses resolve from `assets/networks.json`.
+
+## Capability Index
+
+| User Need | Capability | Detailed Instructions |
+| --- | --- | --- |
+| "lock funds in escrow", "hold payment until delivery", "fund an escrow against a deliverable" | `cast send` approve + `fund(...)` | → [references/clearing-house.md#fund-escrow](../../references/clearing-house.md#fund-escrow) |
+| "release the escrow", "the work was delivered", "pay them now on proof" | `cast send release(...)` | → [references/clearing-house.md#release-on-proof](../../references/clearing-house.md#release-on-proof) |
+| "refund the escrow", "deadline passed", "they didn't deliver" | `cast send refund(...)` | → [references/clearing-house.md#refund-after-deadline](../../references/clearing-house.md#refund-after-deadline) |
+| "check an escrow", "what's the escrow status / amount" | `cast call getEscrow(...)` | → [references/clearing-house.md#read-an-escrow](../../references/clearing-house.md#read-an-escrow) |
+| "run the safety gate before settling" | SDK `clearing_review_action` / MCP | → [references/sentinel-policy.md](../../references/sentinel-policy.md) |
+| "settle an agent-to-agent x402 payment", "pay a paywall", "gate a resource" | SDK / MCP tools | → [references/x402-flow.md](../../references/x402-flow.md) |
+
 ## When to use
 
 - An agent has an approved plan and needs to **lock funds** until a deliverable arrives → `fund_escrow`, then `release` / `refund`.
