@@ -163,3 +163,36 @@ cast logs --address $ESCROW --rpc-url $RPC   # query EscrowFunded/Released/Refun
 **Agent Guidelines.**
 1. Use this to confirm an escrow exists and is `Open` before `release`/`refund`.
 2. Use `cast logs` to reconstruct a counterparty's settlement history (the same signal Credit Bureau reads).
+
+---
+
+## deploy-and-verify
+
+**Overview.** Deploy a fresh `ClearingHouseEscrow` and verify it on Pharos Scan.
+The skill ships an already-deployed, settled instance at
+`0xdE52Ac56708C05FE1f8F69D8074A543FAcB1Faab`; redeploy only for a new environment.
+
+**Command Template.**
+```bash
+forge script script/Deploy.s.sol:Deploy \
+  --rpc-url $RPC --private-key $PRIVATE_KEY --broadcast
+
+# wait for the indexer, then verify (the 10s delay avoids a verify race)
+sleep 10
+forge verify-contract 0xYOUR_DEPLOYED_ADDRESS \
+  src/ClearingHouseEscrow.sol:ClearingHouseEscrow \
+  --chain-id 688689 \
+  --verifier-url https://api.socialscan.io/pharos-atlantic-testnet/v1/explorer/command_api/contract \
+  --verifier blockscout
+```
+
+**Error Handling.**
+| Error | Cause | Suggested action |
+| --- | --- | --- |
+| `psycopg2` / SQL error on verify | Verify run too soon after deploy | Add `sleep 10` between deploy and verify. |
+| `forge/cast: command not found` | Foundry not installed | `curl -L https://foundry.paradigm.xyz \| bash && foundryup`. |
+
+**Agent Guidelines.**
+1. Run the deploy script; capture the address from the broadcast output.
+2. Wait 10 seconds, then verify against the Atlantic Blockscout endpoint.
+3. Confirm the green verified badge on `atlantic.pharosscan.xyz`.
